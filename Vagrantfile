@@ -14,18 +14,37 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
+class VagrantPlugins::ProviderVirtualBox::Action::Network
+  def dhcp_server_matches_config?(dhcp_server, config)
+    true
+  end
+end
+
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.forward_x11 = true
 
+#  config.vm.network "public_network", auto_config: false
+
+  # manual ip
+#  config.vm.provision "shell",
+#  run: "always",
+#  inline: "ifconfig enp0s8  192.168.0.17 netmask 255.255.255.0 up"
+  
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
   config.vm.provider "virtualbox" do |vb|
+      # host only adapter
+      config.vm.network "private_network", :type => 'dhcp', :name => 'vboxnet0', :adapter => 2
+
       # Don't boot with headless mode
       #   vb.gui = true
       #
       #   # Use VBoxManage to customize the VM. For example to change memory:
+#      vb.customize ["modifyvm", :id, "--nictrace2", "on"]
+#      vb.customize ["modifyvm", :id, "--nictracefile1", "trace1.pcap"]
       vb.customize ["modifyvm", :id, "--memory", "3192"]
       vb.customize ["modifyvm", :id, "--ioapic", "on"]
       vb.customize ["modifyvm", :id, "--cpus", "2"]
